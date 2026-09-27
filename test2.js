@@ -17,9 +17,7 @@ class Product {
     return this.#price;
   }
 
-  getStock() {
-    if (this.#stock === 0) return { message: `${this.#name} not available` };
-
+  getStock() {
     return this.#stock;
   }
 
