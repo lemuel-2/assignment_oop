@@ -4,6 +4,27 @@ class Product {
   #stock;
 
   constructor(name, price, stock) {
+    if (typeof name !== "string" || name.trim() === "") {
+      throw new Error("Name must be a non-empty string.");
+    }
+
+    // Validate price
+    if (typeof price !== "number" || isNaN(price) || price < 0) {
+      throw new Error(
+        "Price must be a valid number greater than or equal to 0.",
+      );
+    }
+
+    // Validate stock
+    if (
+      typeof stock !== "number" ||
+      isNaN(stock) ||
+      !Number.isInteger(stock) ||
+      stock < 0
+    ) {
+      throw new Error("Stock must be a valid non-negative integer.");
+    }
+
     this.#name = name;
     this.#price = price;
     this.#stock = stock;
@@ -11,13 +32,9 @@ class Product {
 
   // the subtract the quantity of the stock
   reduceStock(quantity) {
-    // check value if integer or Number
+    // check if quantity is valid
     if (!Number.isInteger(quantity)) return false;
-
-    // check if the quantity is not less than zero
     if (quantity <= 0) return false;
-
-    // check if the stock have available quantity
     if (quantity > this.#stock) return false;
 
     // available stock
@@ -46,6 +63,7 @@ class Product {
   getStock() {
     return this.#stock;
   }
+
 }
 
 class ShoppingCart {
@@ -61,35 +79,40 @@ class ShoppingCart {
     this.#ramainingStock = [];
   }
 
-  // add Item to items(Chart)
-  // return if succesfull or not
+  /*
+   * add Item to items(Chart)
+   * return if succesfull or not
+   */
   addItem(product, quantity) {
     const productName = product.getName();
-    
+
     if (!product.reduceStock(quantity)) {
-      const message = `Unable to add item: ${productName}`
+      const message = `Unable to add item: ${productName}`;
       this.#addItemStatus.push(message);
-      this.#ramainingStock.push(`Item: ${productName}, stock: ${product.getStock()}`);
+      this.#ramainingStock.push(
+        `Item: ${productName}, stock: ${product.getStock()}`,
+      );
       return message;
     }
-    
 
     this.#items.push({
       product: product,
       quantity: quantity,
     });
 
-    const message = `Item: ${productName} added successfully`
+    const message = `Item: ${productName} added successfully`;
     this.#addItemStatus.push(message);
-    this.#ramainingStock.push(`Item: ${productName}, stock: ${product.getStock()}`);
+    this.#ramainingStock.push(
+      `Item: ${productName}, stock: ${product.getStock()}`,
+    );
     return message;
   }
 
   /*
-  show customer name
-  show every list of item in the cart
-  show the quantity of item and subtotal amount of the item
-  show the total cost of the cart  
+   * show customer name
+   * show every list of item in the cart
+   * show the quantity of item and subtotal amount of the item
+   * show the total cost of the cart
    */
   displayCart() {
     console.log(`Customer Name: ${this.#customerName}`);
@@ -120,9 +143,9 @@ class ShoppingCart {
   }
 
   /*
-  show if the addItem is succefully added in the cart
-  show the ramaining stock in the products
-  */
+   * show if the addItem is succefully added in the cart
+   * show the ramaining stock in the products
+   */
   #showAddItemStatus() {
     console.log(`\nCustomer: ${this.#customerName}`);
     for (let i = 0; i < this.#addItemStatus.length; i++) {
@@ -188,28 +211,27 @@ function main() {
   customer1.displayCart();
 
   console.log("================");
-  
+
   // 2nd customer
   console.log();
   const customer2 = new ShoppingCart("Jomar");
-  
+
   // add item to customer2 cart
   customer2.addItem(product1, 4);
   customer2.addItem(product2, 3);
   customer2.addItem(product3, 2);
   customer2.addItem(product4, 1);
-  
+
   customer2.showAddItemStatusAndRamainingStock();
   customer2.displayCart();
   console.log("================");
-  
+
   // customer3
   const customer3 = new ShoppingCart("Jerome");
-  
+
   customer3.showAddItemStatusAndRamainingStock();
   customer3.displayCart();
   console.log("================");
 }
 
 main();
-
