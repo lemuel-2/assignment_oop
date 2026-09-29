@@ -14,7 +14,7 @@ class Product {
     // check value if integer or Number
     if (!Number.isInteger(quantity)) return false;
 
-    // check if the quantiry is not less than zero
+    // check if the quantity is not less than zero
     if (quantity <= 0) return false;
 
     // check if the stock have available quantity
@@ -51,32 +51,48 @@ class Product {
 class ShoppingCart {
   #customerName;
   #items;
+  #addItemStatus;
+  #ramainingStock;
 
   constructor(customerName = "customer") {
     this.#customerName = customerName;
     this.#items = [];
+    this.#addItemStatus = [];
+    this.#ramainingStock = [];
   }
 
   // add Item to items(Chart)
   // return if succesfull or not
   addItem(product, quantity) {
-    if (!product.reduceStock(quantity))
-      return `Unable to add item: ${product.getName()}`; // if false return unable to add
+    const productName = product.getName();
+    
+    if (!product.reduceStock(quantity)) {
+      const message = `Unable to add item: ${productName}`
+      this.#addItemStatus.push(message);
+      this.#ramainingStock.push(`Item: ${productName}, stock: ${product.getStock()}`);
+      return message;
+    }
+    
 
     this.#items.push({
       product: product,
       quantity: quantity,
     });
 
-    return `Item: ${product.getName()} added successfully`;
+    const message = `Item: ${productName} added successfully`
+    this.#addItemStatus.push(message);
+    this.#ramainingStock.push(`Item: ${productName}, stock: ${product.getStock()}`);
+    return message;
   }
 
-  // show customer name
-  // show every list of item in the cart
-  // show the quantity of item and subtotal amount of the item
-  // show the total cost of the cart
+  /*
+  show customer name
+  show every list of item in the cart
+  show the quantity of item and subtotal amount of the item
+  show the total cost of the cart  
+   */
   displayCart() {
-    console.log(`Customer Name: ${this.#customerName}\n`);
+    console.log(`Customer Name: ${this.#customerName}`);
     this.#showListOfProductInfo();
     console.log(`Total: ${this.calculateTotal()}`);
   }
@@ -89,22 +105,49 @@ class ShoppingCart {
     let total = 0;
     for (const item of this.#items)
       total += item.product.getPrice() * item.quantity; // loop for every item in the list
-
     return total;
+  }
+
+  showAddItemStatusAndRamainingStock() {
+    if (this.#addItemStatus.length === 0) {
+      console.log("No item added");
+      return;
+    }
+
+    this.#showAddItemStatus();
+    this.#showTheRamainingStock();
+    console.log();
+  }
+
+  /*
+  show if the addItem is succefully added in the cart
+  show the ramaining stock in the products
+  */
+  #showAddItemStatus() {
+    console.log(`\nCustomer: ${this.#customerName}`);
+    for (let i = 0; i < this.#addItemStatus.length; i++) {
+      console.log(this.#addItemStatus[i]);
+    }
   }
 
   // show the List product information
   #showListOfProductInfo() {
     if (this.#items.length === 0) {
-      console.log("No item found")
-      return
-    };
+      console.log("No item found");
+      return;
+    }
 
     for (let i = 0; i < this.#items.length; i++) {
-      const item = this.#items[i];
-
       console.log(`Item ${i + 1}`);
-      this.#showProductInfo(item);
+      this.#showProductInfo(this.#items[i]);
+    }
+  }
+
+  // show the ramaining stock of the product after added in the cart
+  #showTheRamainingStock() {
+    console.log("\nRamaining Stock");
+    for (let i = 0; i < this.#ramainingStock.length; i++) {
+      console.log(this.#ramainingStock[i]);
     }
   }
 
@@ -120,63 +163,53 @@ class ShoppingCart {
 function main() {
   // list of the Product
   const product1 = new Product("Laptop", 45_000, 10);
-  const product2 = new Product("Mouse", 700, 120);
+  const product2 = new Product("Mouse", 700, 25);
   const product3 = new Product("ram", 21_000, 15);
   const product4 = new Product("monitor", 21_000, 1);
+
+  // Show the product information
+  console.log(product1.productInfo());
+  console.log(product2.productInfo());
+  console.log(product3.productInfo());
+  console.log(product4.productInfo());
+
+  // console.log();
 
   // 1st customer
   const customer1 = new ShoppingCart("Lemuel");
 
   // add item to customer1 cart
-  console.log(customer1.addItem(product1, 2));
-  console.log(customer1.addItem(product2, 3));
-  console.log(customer1.addItem(product3, 2));
-  console.log(customer1.addItem(product4, 4));
+  customer1.addItem(product1, 2);
+  customer1.addItem(product2, 3);
+  customer1.addItem(product3, 2);
+  customer1.addItem(product4, 4);
 
-  console.log();
-
-  // show the available stock
-  console.log("Available stock:");
-  console.log(`${product1.getName()}: ${product1.getStock()}`);
-  console.log(`${product2.getName()}: ${product2.getStock()}`);
-  console.log(`${product3.getName()}: ${product3.getStock()}`);
-  console.log(`${product4.getName()}: ${product4.getStock()}`);
-
-  console.log();
+  customer1.showAddItemStatusAndRamainingStock();
   customer1.displayCart();
 
-  // ===
   console.log("================");
-
+  
   // 2nd customer
   console.log();
   const customer2 = new ShoppingCart("Jomar");
-
+  
   // add item to customer2 cart
-  console.log(customer2.addItem(product1, 4));
-  console.log(customer2.addItem(product2, 3));
-  console.log(customer2.addItem(product3, 2));
-  console.log(customer2.addItem(product4, 1));
-
-  console.log();
-
-  // show the available stock after the add to cart
-  console.log("Available stock:");
-  console.log(`${product1.getName()}: ${product1.getStock()}`);
-  console.log(`${product2.getName()}: ${product2.getStock()}`);
-  console.log(`${product3.getName()}: ${product3.getStock()}`);
-  console.log(`${product4.getName()}: ${product4.getStock()}`);
-
-  console.log();
+  customer2.addItem(product1, 4);
+  customer2.addItem(product2, 3);
+  customer2.addItem(product3, 2);
+  customer2.addItem(product4, 1);
+  
+  customer2.showAddItemStatusAndRamainingStock();
   customer2.displayCart();
-
-  // ===
   console.log("================");
-
-  console.log();
+  
   // customer3
   const customer3 = new ShoppingCart("Jerome");
+  
+  customer3.showAddItemStatusAndRamainingStock();
   customer3.displayCart();
+  console.log("================");
 }
 
 main();
+
